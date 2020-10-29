@@ -33,6 +33,6 @@ jobs:
         CGO_ENABLED: 1
         
     - name: Publish binary to Artifactory
-      if: contains(github.ref, 'master')
+      if: contains(github.ref, 'main')
       run: |
-        jfrog rt u --url=${{ secrets.ART_URL }} --apikey=${{ secrets.ART_TOKEN }} --flat=true "./oc" "${{ secrets.ART_PATH }}/oc"
+        jfrog rt u --url=${{ secrets.ART_URL }} --apikey=${{ secrets.ART_TOKEN }} --flat=true "./oc" "${{ secrets.ART_PATH }}/darwin-oc"
