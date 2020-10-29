@@ -1,0 +1,38 @@
+name: Go
+
+on:
+  workflow_dispatch:
+  push:
+  schedule:
+    - cron: '0 0 1 * *'
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: macos-latest
+    steps:
+
+    - name: Set up Go 1.x
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.13
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+      with:
+        repository: openshift/oc
+        fetch-depth: 0
+
+    - name: Get dependencies
+      run: brew install heimdal jfrog-cli
+
+    - name: Build
+      run: make oc
+      env:
+        CGO_ENABLED: 1
+        
+    - name: Publish binary to Artifactory
+      if: contains(github.ref, 'master')
+      run: |
+        jfrog rt u --url=${{ secrets.ART_URL }} --apikey=${{ secrets.ART_TOKEN }} --flat=true "./oc" "${{ secrets.ART_PATH }}/oc"
